@@ -50,6 +50,26 @@ prop_no_vending_entry <- nyc_subway_entrances |>
 ```
 The proportion of station entrances/exits without vending that allow entrance is `r prop_no_vending_entry`.
 
+## Section 5 Reformatting data for route analysis:
+```{r}
+nyc_subway2 <- nyc_subway_entrances |> 
+  pivot_longer(cols = starts_with("route"),
+    names_to = "route_number",
+    values_to = "route_name",
+    values_drop_na = TRUE) |> 
+  distinct(line, station_name, route_name, .keep_all = TRUE)
+
+a_train_stations <- nyc_subway2 |> 
+  filter(route_name == "A") |> 
+  distinct(line, station_name) |> 
+  nrow()
+
+a_train_ada_stations <- nyc_subway2 |> 
+  filter(route_name == "A", ada == TRUE) |> 
+  distinct(line, station_name) |> 
+  nrow()
+```
+There are `r a_train_stations` distinct stations that serve the A train. Of these, `r a_train_ada_stations` are ADA compliant.
 
 
 
