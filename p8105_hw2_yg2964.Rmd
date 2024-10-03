@@ -1,7 +1,7 @@
 ---
 title: "p8105_hw2_yg2964"
 output: github_document
-date: "2024-10-01"
+date: "10/02/2024"
 ---
 Name:Yuchen Gu
 
