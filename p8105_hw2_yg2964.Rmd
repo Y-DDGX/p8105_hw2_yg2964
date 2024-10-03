@@ -24,7 +24,7 @@ nyc_subway_entrances <- read_csv("data/NYC_Transit_Subway_Entrance_And_Exit_Data
 
 This dataset contains information about NYC subway station entrances and exits. The variables include line, station_name, station_latitude, station_longitude, routes served (multiple columns starting with "route"), entry (whether entry is allowed), vending (presence of vending machines), entrance_type, and ada (ADA compliance). The data cleaning steps involved selecting relevant columns, cleaning column names, and converting the entry variable from character to logical. The resulting dataset has `r nrow(nyc_subway_entrances)` rows and `r ncol(nyc_subway_entrances)` columns. These data are not fully tidy, as the route information is spread across multiple columns rather than being in a single column.
 
-## Section 2 Number of distinct stations:
+## Section 2 Number of distinct stations
 ```{r}
 n_distinct_stations <- nyc_subway_entrances |> 
   distinct(line,station_name) |> 
@@ -32,7 +32,7 @@ n_distinct_stations <- nyc_subway_entrances |>
 ```
 There are `r n_distinct_stations` distinct stations.
 
-## Section 3 Number of ADA compliant stations:
+## Section 3 Number of ADA compliant stations
 ```{r}
 n_ada_stations <- nyc_subway_entrances |> 
   filter(ada == TRUE) |> 
@@ -41,7 +41,7 @@ n_ada_stations <- nyc_subway_entrances |>
 ```
 There are `r n_ada_stations` ADA compliant stations.
 
-## Section 4 Proportion of station entrances/exits without vending that allow entrance:
+## Section 4 Proportion of station entrances/exits without vending that allow entrance
 ```{r}
 prop_no_vending_entry <- nyc_subway_entrances |> 
   filter (vending == "NO") |> 
@@ -50,7 +50,7 @@ prop_no_vending_entry <- nyc_subway_entrances |>
 ```
 The proportion of station entrances/exits without vending that allow entrance is `r prop_no_vending_entry`.
 
-## Section 5 Reformatting data for route analysis:
+## Section 5 Reformatting data for route analysis
 ```{r}
 nyc_subway2 <- nyc_subway_entrances |> 
   pivot_longer(cols = starts_with("route"),
@@ -76,7 +76,7 @@ There are `r a_train_stations` distinct stations that serve the A train. Of thes
 
 ## Section 1: Import and clean the data 
 
-### For Mr.Trash Wheel:
+### For Mr.Trash Wheel
 ```{r}
 mr_trash_wheel <- read_excel("data/202409 Trash Wheel Collection Data.xlsx",
   sheet = "Mr. Trash Wheel",
@@ -87,7 +87,7 @@ mr_trash_wheel <- read_excel("data/202409 Trash Wheel Collection Data.xlsx",
   mutate(sports_balls = as.integer(round(sports_balls)),trash_wheel = "Mr. Trash Wheel")
 ```
 
-###  For Professor Trash Wheel:
+###  For Professor Trash Wheel
 ```{r}
 professor_trash_wheel <- read_excel("data/202409 Trash Wheel Collection Data.xlsx",
   sheet = "Professor Trash Wheel",
@@ -98,7 +98,7 @@ professor_trash_wheel <- read_excel("data/202409 Trash Wheel Collection Data.xls
   mutate(trash_wheel = "Professor Trash Wheel")
 ```
 
-### For Gwynnda:
+### For Gwynnda
 ```{r}
 gwynnda <- read_excel("data/202409 Trash Wheel Collection Data.xlsx",
   sheet = "Gwynnda Trash Wheel",
@@ -109,7 +109,7 @@ gwynnda <- read_excel("data/202409 Trash Wheel Collection Data.xlsx",
   mutate(trash_wheel = "Gwynnda")
 ```
 
-## Section 2: Data Combination:
+## Section 2: Data Combination
 ```{r}
 # For Mr. Trash Wheel
 mr_trash_wheel <- mr_trash_wheel |>
@@ -240,9 +240,31 @@ star_bakers_winners <- final_dataset_merge |>
 knitr::kable(star_bakers_winners, caption = "Star Bakers and Winners for Seasons 5-10")
 ```
 
+This table reveals interesting patterns in the Great British Bake Off, Seasons 5-10. While frequent Star Bakers often become series winners, there are notable exceptions. Nancy in Season 5 won despite Richard's five Star Baker titles. Nadiya and Candice in Seasons 6 and 7 followed a more predictable path, earning multiple Star Baker titles before winning.
+The most surprising outcome is in Season 10, where David won without ever being Star Baker. This contrasts with Steph, who was Star Baker four times but didn't win. Rahul's win in Season 9 shows how early success combined with a strong finish can lead to victory.
 
+## Section 3
+### 3.1 Import and clean data
+```{r, message=FALSE}
+viewers_c <- read_csv("data/viewers.csv", na = c("NA", "", ".", " ")) |> 
+  janitor::clean_names()
+```
 
+### 3.2 Show first 10 rows
+```{r}
+head(viewers_c,10)
+```
 
+### 3.3 Average viewership in Season 1 and Season 5
+```{r}
+avg_season1 = mean(pull(viewers_c, series_1), na.rm = TRUE)
+avg_season5 = mean(pull (viewers_c, series_5), na.rm = TRUE)
+```
+
+The analysis of the GBBO viewership data shows that:
+
+1. The average viewership in Season 1 was `r avg_season1`.
+2. The average viewership in Season 5 was `r avg_season5`.
 
 
 
