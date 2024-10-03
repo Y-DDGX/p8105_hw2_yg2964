@@ -150,6 +150,7 @@ Professor Trash Wheel collected a total of `r sprintf("%.2f", total_weight_profe
 # Problem 3
 ## Section 1
 ### 1.1 Import and clean bakers dataset
+I separated the baker_name column into baker_first_name and last_name. This was done to align with other datasets that primarily use first names for identification.
 ```{r, message=FALSE}
 bakers_c <- read_csv("data/bakers.csv", na = c("NA", "", ".", " ")) |> 
   janitor::clean_names() |> 
@@ -157,6 +158,7 @@ bakers_c <- read_csv("data/bakers.csv", na = c("NA", "", ".", " ")) |>
 ```
 
 ### 1.2 Import and clean bakes dataset
+I renamed the baker column to baker_first_name for consistency with other datasets.
 ```{r, message=FALSE}
 bakes_c <- read_csv("data/bakes.csv", na = c("NA", "", ".", " ")) |> 
   janitor::clean_names() |> 
@@ -164,6 +166,7 @@ bakes_c <- read_csv("data/bakes.csv", na = c("NA", "", ".", " ")) |>
 ```
 
 ### 1.3 Import and clean results dataset
+I skipped the first two rows during import as they likely contained header information. Also, I renamed the baker column to baker_first_name for consistency, and used case_match() to standardize and clarify the result column values, making them more descriptive (e.g., "IN" to "stayed in", "OUT" to "Eliminated").
 ```{r, message=FALSE}
 results_c <- read_csv("data/results.csv", na = c("NA", "", ".", " "), skip = 2) |> 
   janitor::clean_names() |> 
@@ -219,8 +222,23 @@ final_dataset_merge <- results_c |>
 write_csv(final_dataset_merge, "data/final_dataset_merged.csv")
 ```
 
+### 1.8 Description
+In my data cleaning process, I focused on creating consistency across the datasets. I separated the baker's full name into first and last names in the bakers dataset, as other datasets primarily used first names. This decision helped streamline the merging process later.
+For the results dataset, I standardized the 'result' column values to make them more descriptive. For example, I changed "IN" to "stayed in" and "OUT" to "Eliminated".
+I used anti_join operations to check for mismatches between datasets, ensuring data integrity.
+When merging the datasets, I used left joins starting with the results dataset as the base. I then joined the bakers and bakes data using common columns like baker_first_name, series, and episode.
+The resulting merged dataset, final_dataset_merge, contains `r ncol(final_dataset_merge)` variables and `r nrow(final_dataset_merge)` observations.
 
-
+## Section 2
+```{r}
+library(dplyr)
+library(knitr)
+star_bakers_winners <- final_dataset_merge |> 
+  filter(series >= 5 & series <= 10 & (result == "Star Baker" | result == "Series Winner")) |> 
+  select(series, episode, baker_first_name, result) |> 
+  arrange(series, episode)
+knitr::kable(star_bakers_winners, caption = "Star Bakers and Winners for Seasons 5-10")
+```
 
 
 
