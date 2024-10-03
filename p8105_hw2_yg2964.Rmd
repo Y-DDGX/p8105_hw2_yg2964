@@ -5,13 +5,13 @@ date: "2024-10-01"
 ---
 Name:Yuchen Gu
 
-# Problem 1
-
 ```{r,echo=FALSE, message=FALSE}
 library(tidyverse)
 library(readr)
+library(readxl)
+library(lubridate)
 ```
-
+# Problem 1
 ## Section 1 Import and clean the data
 ```{r}
 nyc_subway_entrances <- read_csv("data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv",
@@ -78,9 +78,6 @@ There are `r a_train_stations` distinct stations that serve the A train. Of thes
 
 ### For Mr.Trash Wheel:
 ```{r}
-library(readxl)
-library(tidyverse)
-
 mr_trash_wheel <- read_excel("data/202409 Trash Wheel Collection Data.xlsx",
   sheet = "Mr. Trash Wheel",
   range = cell_cols("A:N"),
@@ -151,10 +148,76 @@ The combined trash wheel dataset contains `r nrow(trash_wheel_data)` observation
 Professor Trash Wheel collected a total of `r sprintf("%.2f", total_weight_professor)` tons of trash since its inception. In a specific timeframe, Gwynnda collected `r format(gwynnda_cig_butts_june_2022, big.mark = ",")` cigarette butts in June 2022 alone. 
 
 # Problem 3
-## Section 1:Import and clean data
-### 1.1 Bakers Data
+## Section 1
+### 1.1 Import and clean bakers dataset
+```{r, message=FALSE}
+bakers_c <- read_csv("data/bakers.csv", na = c("NA", "", ".", " ")) |> 
+  janitor::clean_names() |> 
+  separate(baker_name, into = c("baker_first_name", "last_name"), sep = " ")
+```
 
+### 1.2 Import and clean bakes dataset
+```{r, message=FALSE}
+bakes_c <- read_csv("data/bakes.csv", na = c("NA", "", ".", " ")) |> 
+  janitor::clean_names() |> 
+  rename(baker_first_name = baker)
+```
 
+### 1.3 Import and clean results dataset
+```{r, message=FALSE}
+results_c <- read_csv("data/results.csv", na = c("NA", "", ".", " "), skip = 2) |> 
+  janitor::clean_names() |> 
+  rename(baker_first_name = baker) |> 
+  mutate(result = case_match(
+      result,
+      "IN" ~ "stayed in",
+      "OUT" ~ "Eliminated",
+      "STAR BAKER" ~ "Star Baker",
+      "WINNER" ~ "Series Winner",
+      "Runner-up" ~ "Series Runner up",
+      "WD" ~ "withdrew"
+    )
+  )
+```
+
+### 1.4 Import and clean results dataset
+```{r, message=FALSE}
+results_c <- read_csv("data/results.csv", na = c("NA", "", ".", " "), skip = 2) |> 
+  janitor::clean_names() |> 
+  rename(baker_first_name = baker) |> 
+  mutate(result = case_match(
+      result,
+      "IN" ~ "stayed in",
+      "OUT" ~ "Eliminated",
+      "STAR BAKER" ~ "Star Baker",
+      "WINNER" ~ "Series Winner",
+      "Runner-up" ~ "Series Runner up",
+      "WD" ~ "withdrew"
+    )
+  )
+```
+
+### 1.5 Check for completeness and correctness across datasets.
+```{r}
+anti_join(bakers_c, bakes_c)
+
+anti_join(bakers_c, results_c)
+
+anti_join(results_c, bakes_c)
+```
+
+### 1.6 Merge datasets
+```{r}
+final_dataset_merge <- results_c |> 
+  left_join(bakers_c, by = c("baker_first_name", "series") ) |> 
+  left_join(bakes_c, by = c("baker_first_name", "series", "episode" )) |> 
+  relocate(series, episode, baker_first_name)
+```
+
+### 1.7 Export Final dataset
+```{r}
+write_csv(final_dataset_merge, "data/final_dataset_merged.csv")
+```
 
 
 
